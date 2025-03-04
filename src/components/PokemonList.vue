@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch, defineEmits } from "vue";
-import { fetchAPI, getIDPokemon } from "../utils";
+import { fetchAPI, getIDPokemon } from "../utils/getID";
 import PokemonItem from "../PokemonItem/PokemonItem.vue";
 import LoadMore from "../LoadMore/LoadMore.vue";
 
@@ -10,36 +10,30 @@ const props = defineProps({
 
 const emit = defineEmits(["update:isSelect"]);
 
-const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=300";
+// const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=300";
 let allPokemons = ref([]);
 let displayedPokemons = ref([]);
 let filteredPokemons = ref([]);
 const offset = ref(0);
 const batchSize = 36;
-
+console.log(1111)
 
 const getPokemon = async () => {
-    const cachedPokemons = localStorage.getItem("allPokemons");
+    const cachedPokemons = sessionStorage.getItem("allPokemons");
+    console.log(cachedPokemons);
+    console.log(1111)
 
     if (cachedPokemons) {
         allPokemons.value = JSON.parse(cachedPokemons);
         filterPokemons();
         return;
     }
-    const response = await fetchAPI(url);
-    const pokemonList = response.results.map((pokemon) => ({
-        name: pokemon.name,
-        id: getIDPokemon(pokemon.url),
-        url: pokemon.url
-
-        
-    }));
+    const pokemonList = fetchAPI(cachedPokemons.url)
 
     allPokemons.value = pokemonList;
-    localStorage.setItem("allPokemons", JSON.stringify(pokemonList));
+    sessionfStorage.setItem("Pokemons", JSON.stringify(pokemonList));
     filterPokemons();
 
-    
 };
 
 
@@ -68,7 +62,7 @@ const handleLoadMore = () => {
 };
 
 const handleSelectPokemon = (pokemon) => {
-    localStorage.setItem("selectedPokemon", JSON.stringify(pokemon)); // 🟢 Lưu cả Pokémon vào `localStorage`
+    sessionStorage.setItem("selectedPokemon", JSON.stringify(pokemon)); // 🟢 Lưu cả Pokémon vào `sessionStorage`
     emit("update:isSelect", true); // 🟢 Cập nhật trạng thái hiển thị chi tiết
 };
 
